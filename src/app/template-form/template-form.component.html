@@ -12,7 +12,8 @@
         required #nome="ngModel">
 
         <app-campo-control-erro [mostrarErro]="verificaValidTouched(nome)"
-                                msgErro="Nome é Obrigatorio"></app-campo-control-erro>
+                                msgErro="Nome é Obrigatorio">
+        </app-campo-control-erro>
     </div>
   </div>
 
@@ -35,7 +36,8 @@
     <div class="form-group col-md-3" [ngClass]="aplicaCssErro(cep)">
       <label for="cep" class="control-label">CEP</label>
       <input type="text" class="form-control" id="cep"
-        name="cep" ngModel required #cep="ngModel">
+        name="cep" ngModel required #cep="ngModel"
+        (blur)="consultaCEP(cep.value, f)">
       <span class="glyphicon glyphicon-remove form-control-feedback"
       aria-hidden="true" *ngIf="!cep.valid && cep.touched"></span>
       <span class="sr-only" *ngIf="!cep.valid && cep.touched">(error)</span>
@@ -63,7 +65,7 @@
   </div>
 
      <div class="form-group col-sm-12">
-          <input type="text" class="form-control" id="rua" [(ngModel)]="usuario.rua" name="rua"
+          <input type="text" class="form-control" id="rua" ngModel name="rua"
           required #rua="ngModel" readonly>
         <div *ngIf="!rua.valid && rua.touched"
               class="alert alert-danger" role="alert">Rua é Obrigatório
