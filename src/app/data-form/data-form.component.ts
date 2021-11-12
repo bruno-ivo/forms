@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 
@@ -12,27 +12,108 @@ export class DataFormComponent implements OnInit {
 
   formulario: any;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+              private formBuilder: FormBuilder,) {}
 
   ngOnInit(): void {
-    this.formulario = new FormGroup({
+    /*this.formulario = new FormGroup({
       nome: new FormControl(null),
       email: new FormControl(null),
-    });
+    });*/
+
+    this.formulario = this.formBuilder.group({
+      nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
+      email: [null, [Validators.required, Validators.email]],
+      endereco: this.formBuilder.group({
+        cep: [null, Validators.required],
+        numero: [null, Validators.required],
+        complemento: [null],
+        rua: [null, Validators.required],
+        bairro: [null, Validators.required],
+        cidade: [null, Validators.required],
+        estado: [null, Validators.required],
+      })
+    })
   }
 
   onSubmit(){
-    this.http.post('https://httpbin.org/post', JSON.stringify(this.formulario.value))
-    .pipe(map(res => res))
-    .subscribe(dados => {
-      console.log(dados);
-      //reseta o form
-      this.resetar();
+    if(this.formulario.valid){
+      this.http.post('https://httpbin.org/post', JSON.stringify(this.formulario.value))
+      .pipe(map(res => res))
+      .subscribe(dados => {
+        console.log(dados);
+        //reseta o form
+        this.resetar();
+      });
+    }else {
+      console.log('formulario invalido');
+      this.verificaValidacoesForm(this.formulario);
+    }
+  }
+
+  verificaValidacoesForm(formGroup: FormGroup){
+    Object.keys(this.formulario.controls).forEach((campo) =>{
+      console.log(campo);
+      const controle = this.formulario.get(campo);
+      controle.markAsTouched();
+      if (controle instanceof FormGroup) {
+        this.verificaValidacoesForm(controle);
+      }
     });
   }
 
   resetar(){
     this.formulario.reset();
+  }
+
+  verificaValidTouched(campo: any){
+    return !this.formulario.get(campo).valid &&  this.formulario.get(campo).touched;
+  }
+
+  aplicaCssErro(campo: any){
+    return {
+      'has-error': this.verificaValidTouched(campo),
+      'has-feedback': this.verificaValidTouched(campo),
+    }
+  }
+
+  consultaCEP(){
+    let cep = this.formulario.get('endereco.cep').value;
+    cep = cep.replace(/\D/g, '');
+    if (cep != "") {
+      var validacep = /^[0-9]{8}$/;
+      if(validacep.test(cep)){
+          this.resetaDadosForm();
+          this.http.get("https://viacep.com.br/ws/"+ cep +"/json/")
+          .pipe(map(dados => dados))
+          .subscribe(dados =>  this.populaDadosForm(dados) );
+      }
+    }
+  }
+
+  populaDadosForm(dados: any){
+     this.formulario.pathValue({
+       endereco: {
+         cep: dados.cep,
+         complemento: dados.complemento,
+         rua: dados.logradouro,
+         bairro: dados.bairro,
+         cidade: dados.localidade,
+         estado: dados.uf
+       }
+    });
+   }
+
+   resetaDadosForm() {
+    this.formulario.patchValue({
+      endereco: {
+        rua: null,
+        complemento: null,
+        bairro: null,
+        cidade: null,
+        estado: null
+      }
+    });
   }
 
 }
