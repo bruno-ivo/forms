@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {map} from 'rxjs/operators';
-import { FormDebugComponent } from '../form-debug/form-debug.component';
+import { FormDebugComponent } from '../shared/form-debug/form-debug.component';
 
 @Component({
   selector: 'app-template-form',
