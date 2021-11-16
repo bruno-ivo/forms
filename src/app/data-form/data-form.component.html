@@ -187,6 +187,18 @@
         </label>
       </div>
     </div>
+    <div class="form-group col-md-3" [ngClass]="aplicaCssErro('frameworks')">
+      <label for="frameworks">Frameworks</label>
+      <div id="frameworks" class="row">
+        <div class="checkbox" class="form-group col-sm-5"
+         formArrayName="frameworks"
+         *ngFor="let framework of formulario.get('frameworks').controls; let i = index">
+          <label class="checkbox-inline">
+            <input type="checkbox" [formControlName]="i"> {{  frameworks[i]  }}
+          </label>
+      </div>
+      </div>
+    </div>
   </div>
 
   <div>
