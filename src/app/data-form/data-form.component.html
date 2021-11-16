@@ -179,6 +179,16 @@
     </div>
   </div>
 
+  <div class="form-row">
+    <div class="form-group col-md-3" [ngClass]="aplicaCssErro('termos')">
+      <div class="checkbox">
+        <label class="checkbox-inline">
+          <input type="checkbox" value="option1" formControlName="termos"> Aceito os termos.
+        </label>
+      </div>
+    </div>
+  </div>
+
   <div>
     <button
       type="submit"
