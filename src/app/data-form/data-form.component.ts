@@ -4,6 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { DropdownService } from '../shared/services/dropdown.service';
 import { EstadoBr } from '../shared/models/estado-br.models';
+import { ConsultaCepService } from '../shared/services/consulta-cep.service';
+import { Observable } from 'rxjs';
+import { ArrayType } from '@angular/compiler';
 
 @Component({
   selector: 'app-data-form',
@@ -13,20 +16,30 @@ import { EstadoBr } from '../shared/models/estado-br.models';
 export class DataFormComponent implements OnInit {
 
   formulario: any;
-  estados: EstadoBr [] = [];
+  //estados: EstadoBr [] = [];
+  estados: Observable<EstadoBr[]> = new Observable;
+  cargos: any[] = [];
+  tecnologias: any[] = [];
+  newsletterOp: any = [];
 
   constructor(private http: HttpClient,
               private formBuilder: FormBuilder,
-              private dropwdownService: DropdownService,) {}
+              private dropwdownService: DropdownService,
+              private cepService: ConsultaCepService) {}
 
   ngOnInit(): void {
 
+    this.estados = this.dropwdownService.getEstadosBr();
+    this.cargos = this.dropwdownService.getCargos();
+    this.tecnologias = this.dropwdownService.getTecnologias();
+    this.newsletterOp = this.dropwdownService.getNewsletter();
+    /*
     this.dropwdownService.getEstadosBr()
     .subscribe((res: EstadoBr) => {
       this.estados.push(res);
       console.log(res);
-
     });
+    */
     /*this.formulario = new FormGroup({
       nome: new FormControl(null),
       email: new FormControl(null),
@@ -43,7 +56,11 @@ export class DataFormComponent implements OnInit {
         bairro: [null, Validators.required],
         cidade: [null, Validators.required],
         estado: [null, Validators.required],
-      })
+      }),
+
+      cargo: [null],
+      tecnologias: [null],
+      newsletter: [null],
     })
   }
 
@@ -70,6 +87,7 @@ export class DataFormComponent implements OnInit {
       if (controle instanceof FormGroup) {
         this.verificaValidacoesForm(controle);
       }
+
     });
   }
 
@@ -89,16 +107,12 @@ export class DataFormComponent implements OnInit {
   }
 
   consultaCEP(){
-    let cep = this.formulario.get('endereco.cep').value;
-    cep = cep.replace(/\D/g, '');
-    if (cep != "") {
-      var validacep = /^[0-9]{8}$/;
-      if(validacep.test(cep)){
-          //this.resetaDadosForm();
-          this.http.get("https://viacep.com.br/ws/"+ cep +"/json/")
-          .pipe(map(dados => dados))
-          .subscribe(dados =>  this.populaDadosForm(dados, this.formulario) );
-      }
+    const cep = this.formulario.get('endereco.cep').value;
+
+    if(cep != null && cep !== '') {
+      this.cepService.consultaCEP(cep)
+      .pipe(map(dados => dados))
+      .subscribe(dados =>  this.populaDadosForm(dados, this.formulario) );
     }
   }
 
@@ -129,6 +143,15 @@ export class DataFormComponent implements OnInit {
         estado: null
       }
     });
+  }
+
+  setarCargo(){
+    const cargo = { nome: 'Dev', nivel: 'Pleno', desc: 'Dev Pl'};
+    this.formulario.get('cargo').setValue(cargo);
+  }
+
+  compararCargos(obj1: any, obj2: any){
+    return obj1 && obj2 ? (obj1.nome === obj2.nome && obj1.nivel === obj2.nivel) : obj1 === obj2 ;
   }
 
 }
