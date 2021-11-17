@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { ArrayType } from '@angular/compiler';
 import { FormValidations } from '../shared/form-validations';
 import { VerificaEmailService } from './services/verifica-email.service';
+import { Cidade } from '../shared/models/cidades';
 
 @Component({
   selector: 'app-data-form',
@@ -20,6 +21,7 @@ export class DataFormComponent implements OnInit {
   formulario: any;
   //estados: EstadoBr [] = [];
   estados: Observable<EstadoBr[]> = new Observable;
+  cidade: Observable<Cidade[]> = new Observable;
   cargos: any[] = [];
   tecnologias: any[] = [];
   newsletterOp: any = [];
@@ -39,6 +41,7 @@ export class DataFormComponent implements OnInit {
     this.cargos = this.dropwdownService.getCargos();
     this.tecnologias = this.dropwdownService.getTecnologias();
     this.newsletterOp = this.dropwdownService.getNewsletter();
+    this.cidade = this.dropwdownService.getCidades(1);
     /*
     this.dropwdownService.getEstadosBr()
     .subscribe((res: EstadoBr) => {
@@ -154,6 +157,7 @@ export class DataFormComponent implements OnInit {
       .pipe(map(dados => dados))
       .subscribe(dados =>  this.populaDadosForm(dados, this.formulario) );
     }
+    this.dropwdownService.getCidades(8).subscribe(console.log);
   }
 
   populaDadosForm(dados: any,form: any){
