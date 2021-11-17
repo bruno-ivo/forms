@@ -8,6 +8,7 @@ import { ConsultaCepService } from '../shared/services/consulta-cep.service';
 import { Observable } from 'rxjs';
 import { ArrayType } from '@angular/compiler';
 import { FormValidations } from '../shared/form-validations';
+import { VerificaEmailService } from './services/verifica-email.service';
 
 @Component({
   selector: 'app-data-form',
@@ -27,9 +28,12 @@ export class DataFormComponent implements OnInit {
   constructor(private http: HttpClient,
               private formBuilder: FormBuilder,
               private dropwdownService: DropdownService,
-              private cepService: ConsultaCepService) {}
+              private cepService: ConsultaCepService,
+              private verificaEmailService: VerificaEmailService,) {}
 
   ngOnInit(): void {
+
+    //this.verificaEmailService.verificarEmail('').subscribe();
 
     this.estados = this.dropwdownService.getEstadosBr();
     this.cargos = this.dropwdownService.getCargos();
@@ -49,7 +53,8 @@ export class DataFormComponent implements OnInit {
 
     this.formulario = this.formBuilder.group({
       nome: [null, [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
-      email: [null, [Validators.required, Validators.email]],
+      email: [null, [Validators.required, Validators.email], [this.validarEmail.bind(this)]],
+      confirmaEmail: [null, [FormValidations.equalsTo('email')]],
       endereco: this.formBuilder.group({
         cep: [null, Validators.required, FormValidations.cepValidator],
         numero: [null, Validators.required],
@@ -187,6 +192,11 @@ export class DataFormComponent implements OnInit {
 
   compararCargos(obj1: any, obj2: any){
     return obj1 && obj2 ? (obj1.nome === obj2.nome && obj1.nivel === obj2.nivel) : obj1 === obj2 ;
+  }
+
+  validarEmail(formControl: FormControl){
+    return this.verificaEmailService.verificarEmail(formControl.value)
+    .pipe(map(emailExiste => emailExiste ? {emailIvalido: true} : null))
   }
 
 }

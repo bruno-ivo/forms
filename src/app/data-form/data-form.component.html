@@ -37,6 +37,25 @@
       ></app-campo-control-erro>
     </div>
   </div>
+  <div class="form-row" [ngClass]="aplicaCssErro('confirmaEmail')">
+    <div class="form-group col-sm-12">
+      <label for="confirmaEmail" class="control-label">Confirmar Email</label>
+    </div>
+
+    <div class="form-group col-sm-12">
+      <input
+        type="confirmaEmail"
+        class="form-control"
+        formControlName="confirmaEmail"
+        id="confirmaEmail"
+        placeholder="nome@email.com"
+      />
+      <app-campo-control-erro
+        [mostrarErro]="verificaValidTouched('confirmaEmail')"
+        msgErro="Email é Obrigatório"
+      ></app-campo-control-erro>
+    </div>
+  </div>
 
   <div formGroupName="endereco">
     <div class="form-row">
