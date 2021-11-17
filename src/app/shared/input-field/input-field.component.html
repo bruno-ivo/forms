@@ -1,4 +1,5 @@
 <div class="form-row" [ngClass]="classeCSS">
   <label [attr.for]="id" class="control-label">{{ label }}</label>
-  <input [type]="type" class="form-control" [id]="id"/>
+  <input [type]="type" class="form-control" [id]="id" [readonly]="!!isReadOnly"
+  (blur)="onTouchedCb($event)">
 </div>
